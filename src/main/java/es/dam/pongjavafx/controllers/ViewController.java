@@ -1,12 +1,13 @@
 package es.dam.pongjavafx.controllers;
 
+import es.dam.pongjavafx.App;
 import es.dam.pongjavafx.views.View;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -15,8 +16,6 @@ import javafx.util.Duration;
 import java.util.Random;
 
 public class ViewController {
-    private final Label scoreP1 = new Label();
-    private final Label scoreP2 = new Label();
     private final Rectangle bordeNorte;
     private final Rectangle bordeSur;
     private final Rectangle bordeEste;
@@ -29,8 +28,17 @@ public class ViewController {
     private int pointsP1 = 0;
     private int pointsP2 = 0;
     private final View view;
+    private final ImageView goalView;
 
-    public ViewController(Rectangle bordeNorte, Rectangle bordeSur, Rectangle bordeEste, Rectangle bordeOeste, Rectangle player1, Rectangle player2, Circle ball, View view) {
+    public ViewController(Rectangle bordeNorte,
+                          Rectangle bordeSur,
+                          Rectangle bordeEste,
+                          Rectangle bordeOeste,
+                          Rectangle player1,
+                          Rectangle player2,
+                          Circle ball,
+                          View view, ImageView goalView)
+    {
         this.bordeNorte = bordeNorte;
         this.bordeSur = bordeSur;
         this.bordeEste = bordeEste;
@@ -39,6 +47,7 @@ public class ViewController {
         this.player2 = player2;
         this.ball = ball;
         this.view = view;
+        this.goalView = goalView;
     }
 
     public void play() {
@@ -115,23 +124,41 @@ public class ViewController {
         }
 
         if (ball.getBoundsInParent().intersects(bordeEste.getBoundsInParent())) {
-            resetPositions(x, y);
             updateScore(1);
+            resetPositions(x, y);
         }
 
         if (ball.getBoundsInParent().intersects(bordeOeste.getBoundsInParent())) {
-            resetPositions(x, y);
             updateScore(2);
+            resetPositions(x, y);
         }
     }
 
     private void updateScore(int winner) {
         if (winner == 1) {
             pointsP1++;
-            scoreP1.setText("PLAYER 1: " + pointsP1);
+            view.scoreP1.setText("PLAYER 1: " + pointsP1);
+
+            showGoalMessage();
         } else if (winner == 2) {
             pointsP2++;
-            scoreP2.setText("PLAYER 2: " + pointsP2);
+            view.scoreP2.setText("PLAYER 2: " + pointsP2);
+
+            showGoalMessage();
+        }
+    }
+
+    private void showGoalMessage() {
+        goalView.setVisible(true);
+        // TODO: Parar el juego mientras sale la notificación de gol.
+        goalView.setVisible(false);
+    }
+
+    private void checkPoints() {
+        if (pointsP1 >= 10) {
+            // TODO: Mensaje de victoria.
+        } else if (pointsP2 >= 10) {
+            // TODO: Mensaje de victoria.
         }
     }
 
