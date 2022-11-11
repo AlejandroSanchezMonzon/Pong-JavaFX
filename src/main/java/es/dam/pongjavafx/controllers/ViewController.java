@@ -1,19 +1,22 @@
 package es.dam.pongjavafx.controllers;
 
-import es.dam.pongjavafx.App;
 import es.dam.pongjavafx.views.View;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.util.Random;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 public class ViewController {
     private final Rectangle bordeNorte;
@@ -25,10 +28,12 @@ public class ViewController {
     private final Circle ball;
     private Double moveX = randomX();
     private Double moveY = randomY();
+    private Double movePlayer1 = 0.00;
+    private Double movePlayer2 = 0.00;
     private int pointsP1 = 0;
     private int pointsP2 = 0;
     private final View view;
-    private final ImageView goalView;
+    Timeline animation;
 
     public ViewController(Rectangle bordeNorte,
                           Rectangle bordeSur,
@@ -37,7 +42,7 @@ public class ViewController {
                           Rectangle player1,
                           Rectangle player2,
                           Circle ball,
-                          View view, ImageView goalView)
+                          View view)
     {
         this.bordeNorte = bordeNorte;
         this.bordeSur = bordeSur;
@@ -47,21 +52,31 @@ public class ViewController {
         this.player2 = player2;
         this.ball = ball;
         this.view = view;
-        this.goalView = goalView;
     }
 
     public void play() {
         DoubleProperty x = new SimpleDoubleProperty();
         DoubleProperty y = new SimpleDoubleProperty();
+        DoubleProperty yPlayer1 = new SimpleDoubleProperty();
+        DoubleProperty yPlayer2 = new SimpleDoubleProperty();
+
         ball.translateXProperty().bind(x);
         ball.translateYProperty().bind(y);
 
-        Timeline animation = new Timeline(
+        player1.translateYProperty().bind(yPlayer1);
+        player2.translateYProperty().bind(yPlayer2);
+
+        animation = new Timeline(
                 new KeyFrame(Duration.seconds(0.017), t -> {
                     moveBall(x, y);
-                    initControls(getScene(view));
+                    movePlayers(yPlayer1, yPlayer2);
+                    initPlayers(view.getScene());
                     checkGolpeo();
-                    checkWalls(x, y);
+                    try {
+                        checkWalls(x, y, yPlayer1, yPlayer2);
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
                 })
         );
 
@@ -69,37 +84,46 @@ public class ViewController {
         animation.play();
     }
 
-    private Scene getScene(View view) {
-        return view.getScene();
-    }
-
     private void moveBall(DoubleProperty x, DoubleProperty y) {
         x.setValue(x.getValue() + moveX);
         y.setValue(y.getValue() + moveY);
     }
 
-    public void initControls(Scene scene) {
+    private void movePlayers(DoubleProperty yPlayer1, DoubleProperty yPlayer2) {
+        yPlayer1.setValue(yPlayer1.getValue() + movePlayer1);
+        yPlayer2.setValue(yPlayer2.getValue() + movePlayer2);
+    }
+
+    public void initPlayers(Scene scene) {
         scene.setOnKeyPressed(event -> {
-            double moveYPlayers = 8.0;
-            if (event.getCode() == KeyCode.Q) {
-                if (!player1.getBoundsInParent().intersects(bordeNorte.getBoundsInParent())) {
-                    player1.setTranslateY(player1.getTranslateY() - moveYPlayers);
-                }
+            switch (event.getCode()) {
+                case Q:
+                    if (!player1.getBoundsInParent().intersects(bordeNorte.getBoundsInParent())) {
+                        movePlayer1 = -4.00;
+                    }
+                    break;
+                case A:
+                    if (!player1.getBoundsInParent().intersects(bordeSur.getBoundsInParent())) {
+                        movePlayer1 = 4.00;
+                    }
+                    break;
+                case P:
+                    if (!player2.getBoundsInParent().intersects(bordeNorte.getBoundsInParent())) {
+                        movePlayer2 = -4.00;
+                    }
+                    break;
+                case L:
+                    if (!player2.getBoundsInParent().intersects(bordeSur.getBoundsInParent())) {
+                       movePlayer2 = 4.00;
+                    }
+                    break;
             }
-            if (event.getCode() == KeyCode.A) {
-                if (!player1.getBoundsInParent().intersects(bordeSur.getBoundsInParent())) {
-                    player1.setTranslateY(player1.getTranslateY() + moveYPlayers);
-                }
-            }
-            if (event.getCode() == KeyCode.P) {
-                if (!player2.getBoundsInParent().intersects(bordeNorte.getBoundsInParent())) {
-                    player2.setTranslateY(player2.getTranslateY() - moveYPlayers);
-                }
-            }
-            if (event.getCode() == KeyCode.L) {
-                if (!player2.getBoundsInParent().intersects(bordeSur.getBoundsInParent())) {
-                    player2.setTranslateY(player2.getTranslateY() + moveYPlayers);
-                }
+        });
+
+        scene.setOnKeyReleased(event -> {
+            switch (event.getCode()) {
+                case Q, A -> movePlayer1 = 0.0;
+                case P, L -> movePlayer2 = 0.0;
             }
         });
     }
@@ -114,7 +138,7 @@ public class ViewController {
         }
     }
 
-    private void checkWalls(DoubleProperty x, DoubleProperty y) {
+    private void checkWalls(DoubleProperty x, DoubleProperty y, DoubleProperty yPlayer1, DoubleProperty yPlayer2) throws FileNotFoundException {
         if (ball.getBoundsInParent().intersects(bordeNorte.getBoundsInParent())) {
             moveY = 4.0;
         }
@@ -124,57 +148,108 @@ public class ViewController {
         }
 
         if (ball.getBoundsInParent().intersects(bordeEste.getBoundsInParent())) {
+            resetPositions(x, y, yPlayer1, yPlayer2);
             updateScore(1);
-            resetPositions(x, y);
         }
 
         if (ball.getBoundsInParent().intersects(bordeOeste.getBoundsInParent())) {
+            resetPositions(x, y,  yPlayer1, yPlayer2);
             updateScore(2);
-            resetPositions(x, y);
         }
     }
 
-    private void updateScore(int winner) {
+    private void updateScore(int winner) throws FileNotFoundException {
         if (winner == 1) {
             pointsP1++;
             view.scoreP1.setText("PLAYER 1: " + pointsP1);
 
             showGoalMessage();
+            checkPoints();
         } else if (winner == 2) {
             pointsP2++;
             view.scoreP2.setText("PLAYER 2: " + pointsP2);
 
             showGoalMessage();
+            checkPoints();
         }
     }
 
     private void showGoalMessage() {
-        goalView.setVisible(true);
-        // TODO: Parar el juego mientras sale la notificación de gol.
-        goalView.setVisible(false);
+        view.goalView.setVisible(true);
+        animation.stop();
+
+        try {
+            Thread.sleep(900);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        view.goalView.setVisible(false);
+        try {
+            Thread.sleep(300);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        animation.play();
     }
 
-    private void checkPoints() {
-        if (pointsP1 >= 10) {
-            // TODO: Mensaje de victoria.
-        } else if (pointsP2 >= 10) {
-            // TODO: Mensaje de victoria.
+    private void checkPoints() throws FileNotFoundException {
+        Alert alert;
+
+        if (pointsP1 == 7) {
+            alert = new Alert(Alert.AlertType.INFORMATION);
+
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+
+            FileInputStream input = new FileInputStream("images" + File.separator + "win.png");
+            Image image = new Image(input);
+            ImageView imageView = new ImageView(image);
+            stage.getIcons().add(imageView.getImage());
+
+            alert.setTitle("VICTORIA");
+            alert.setHeaderText("EL JUGADOR 1 HA GANADO");
+            alert.setContentText("Reinicie el juego para volver a jugar...");
+            alert.show();
+
+            animation.stop();
+
+        } else if (pointsP2 == 7) {
+            alert = new Alert(Alert.AlertType.INFORMATION);
+
+            Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+
+            FileInputStream input = new FileInputStream("images" + File.separator + "win.png");
+            Image image = new Image(input);
+            ImageView imageView = new ImageView(image);
+            stage.getIcons().add(imageView.getImage());
+
+            alert.setTitle("VICTORIA");
+            alert.setHeaderText("EL JUGADOR 2 HA GANADO");
+            alert.setContentText("Reinicie el juego para volver a jugar...");
+            alert.show();
+
+            animation.stop();
         }
     }
 
-    private void resetPositions(DoubleProperty x, DoubleProperty y) {
-        this.player1.translateYProperty().setValue(0);
-        this.player2.translateYProperty().setValue(0);
-
+    private void resetPositions(DoubleProperty x, DoubleProperty y, DoubleProperty yPlayer1, DoubleProperty yPlayer2) {
         x.setValue(0);
         y.setValue(0);
+        yPlayer1.setValue(0);
+        yPlayer2.setValue(0);
+
         this.ball.translateXProperty().bind(x);
         this.ball.translateYProperty().bind(y);
+
+        this.player1.translateYProperty().bind(yPlayer1);
+        this.player2.translateYProperty().bind(yPlayer2);
+
+        moveX = randomX();
     }
 
     private Double randomX() {
-        Random condition = new Random();
-        if (condition.nextBoolean()) {
+        int condition = (int) (Math.random() * 10 + 1);
+        if (condition <= 5) {
             moveX = 4.0;
         } else {
             moveX = -4.0;
@@ -184,8 +259,8 @@ public class ViewController {
     }
 
     private Double randomY() {
-        Random condition = new Random();
-        if (condition.nextBoolean()) {
+        int condition = (int) (Math.random() * 10 + 1);
+        if (condition <= 5) {
             moveY = 4.0;
         } else {
             moveY = -4.0;

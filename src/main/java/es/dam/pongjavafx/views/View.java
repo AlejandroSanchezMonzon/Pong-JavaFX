@@ -17,12 +17,14 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 public class View extends StackPane {
     public Label scoreP1;
     public Label scoreP2;
+    public ImageView goalView;
 
     public View() throws FileNotFoundException {
         this.setBackground(new Background(new BackgroundFill(Color.FORESTGREEN, new CornerRadii(0), new Insets(0))));
@@ -57,6 +59,18 @@ public class View extends StackPane {
         lineaCentro.setFill(Color.BLACK);
         lineaCentro.heightProperty().bind(this.heightProperty().divide(1));
         lineaCentro.widthProperty().bind(this.widthProperty().divide(40));
+
+        Rectangle cespedPlayer1 = new Rectangle();
+        cespedPlayer1.setFill(Color.DARKGREEN);
+        cespedPlayer1.heightProperty().bind(this.heightProperty().divide(1));
+        cespedPlayer1.widthProperty().bind(this.widthProperty().divide(5));
+        cespedPlayer1.translateXProperty().bind(this.widthProperty().divide(4));
+
+        Rectangle cespedPlayer2 = new Rectangle();
+        cespedPlayer2.setFill(Color.DARKGREEN);
+        cespedPlayer2.heightProperty().bind(this.heightProperty().divide(1));
+        cespedPlayer2.widthProperty().bind(this.widthProperty().divide(5));
+        cespedPlayer2.translateXProperty().bind(this.widthProperty().divide(-4));
 
         Circle circuloCentro = new Circle(30, Color.BLACK);
 
@@ -98,17 +112,18 @@ public class View extends StackPane {
 
         Circle ball = new Circle(15, Color.WHITE);
 
-        FileInputStream input = new FileInputStream("images/start.png");
+        FileInputStream input = new FileInputStream("images" + File.separator + "start.png");
         Image image = new Image(input);
         ImageView imageView = new ImageView(image);
         imageView.setFitHeight(200);
         imageView.setFitWidth(200);
 
-        FileInputStream file = new FileInputStream("images/goal.png");
+        FileInputStream file = new FileInputStream("images" + File.separator +"goal.png");
         Image goal = new Image(file);
-        ImageView goalView = new ImageView(goal);
+        goalView = new ImageView(goal);
         goalView.setFitHeight(200);
         goalView.setFitWidth(200);
+        goalView.setVisible(false);
         StackPane.setAlignment(goalView, Pos.CENTER);
 
         Button start = new Button("", imageView);
@@ -117,7 +132,7 @@ public class View extends StackPane {
         StackPane.setAlignment(start, Pos.CENTER);
 
 
-        ViewController controller = new ViewController(bordeNorte, bordeSur, bordeEste, bordeOeste, player1, player2, ball, this, goalView);
+        ViewController controller = new ViewController(bordeNorte, bordeSur, bordeEste, bordeOeste, player1, player2, ball, this);
 
         start.setOnMouseClicked(event -> {
             controller.play();
@@ -128,8 +143,9 @@ public class View extends StackPane {
             if (event.getCode() == KeyCode.ENTER) {
                 controller.play();
                 start.setVisible(false);
-            }});
+            }
+        });
 
-        this.getChildren().addAll(bordeNorte, bordeSur, bordeEste, bordeOeste, lineaCentro, circuloCentro, title, scoreP1, scoreP2, player1, player2, ball, start);
+        this.getChildren().addAll(cespedPlayer1, cespedPlayer2, player1, player2, bordeNorte, bordeSur, bordeEste, bordeOeste, lineaCentro, circuloCentro, title, scoreP1, scoreP2, ball, start, goalView);
     }
 }
