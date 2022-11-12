@@ -36,6 +36,7 @@ public class ViewController {
     private int pointsP2 = 0;
     private final View view;
     Timeline animation;
+    String dir = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources";
 
     public ViewController(Rectangle bordeNorte,
                           Rectangle bordeSur,
@@ -180,7 +181,7 @@ public class ViewController {
     }
 
     private void reproduceGoal() {
-        String archivoGoal = "audios/score.mp3";
+        String archivoGoal = dir + File.separator + "audios" + File.separator + "score.mp3";
         File archivo = new File(archivoGoal);
         Media audio = new Media(archivo.toURI().toString());
 
@@ -192,7 +193,7 @@ public class ViewController {
     }
 
     private void reproduceGolpeo() {
-        String archivoGolpeo = "audios/golpeo.mp3";
+        String archivoGolpeo = dir + File.separator + "audios" + File.separator + "golpeo.mp3";
         File archivo = new File(archivoGolpeo);
         Media audio = new Media(archivo.toURI().toString());
 
@@ -216,7 +217,7 @@ public class ViewController {
 
             Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
 
-            FileInputStream input = new FileInputStream("images" + File.separator + "win.png");
+            FileInputStream input = new FileInputStream(dir + File.separator + "images" + File.separator + "win.png");
             Image image = new Image(input);
             ImageView imageView = new ImageView(image);
             stage.getIcons().add(imageView.getImage());
@@ -228,13 +229,13 @@ public class ViewController {
 
             view.gameOverView.setVisible(true);
             animation.stop();
-            
+
         } else if (pointsP2 == 7) {
             alert = new Alert(Alert.AlertType.INFORMATION);
 
             Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
 
-            FileInputStream input = new FileInputStream("images" + File.separator + "win.png");
+            FileInputStream input = new FileInputStream(dir + File.separator + "images" + File.separator + "win.png");
             Image image = new Image(input);
             ImageView imageView = new ImageView(image);
             stage.getIcons().add(imageView.getImage());

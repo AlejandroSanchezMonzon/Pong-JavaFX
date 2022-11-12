@@ -22,7 +22,8 @@ public class App extends Application {
         stage.setResizable(false);
         stage.show();
 
-        FileInputStream input = new FileInputStream("images" + File.separator + "ping-pong.png");
+        String dir = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources";
+        FileInputStream input = new FileInputStream(dir + File.separator + "images" + File.separator + "ping-pong.png");
         Image image = new Image(input);
         ImageView imageView = new ImageView(image);
         stage.getIcons().add(imageView.getImage());

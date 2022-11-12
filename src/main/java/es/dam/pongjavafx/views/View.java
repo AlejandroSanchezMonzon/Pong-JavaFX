@@ -27,6 +27,8 @@ public class View extends StackPane {
     public ImageView gameOverView;
 
     public View() throws FileNotFoundException {
+        String dir = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources";
+
         this.setBackground(new Background(new BackgroundFill(Color.FORESTGREEN, new CornerRadii(0), new Insets(0))));
 
         Label title = new Label("PONG! - THE GAME");
@@ -112,13 +114,13 @@ public class View extends StackPane {
 
         Circle ball = new Circle(15, Color.WHITE);
 
-        FileInputStream input = new FileInputStream("images" + File.separator + "start.png");
+        FileInputStream input = new FileInputStream(dir + File.separator + "images" + File.separator + "start.png");
         Image image = new Image(input);
         ImageView imageView = new ImageView(image);
         imageView.setFitHeight(200);
         imageView.setFitWidth(200);
 
-        FileInputStream file = new FileInputStream("images" + File.separator + "game-over.png");
+        FileInputStream file = new FileInputStream(dir + File.separator + "images" + File.separator + "game-over.png");
         Image gameover = new Image(file);
         gameOverView = new ImageView(gameover);
         gameOverView.setFitHeight(200);
