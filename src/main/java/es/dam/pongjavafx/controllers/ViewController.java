@@ -9,6 +9,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
@@ -42,8 +44,7 @@ public class ViewController {
                           Rectangle player1,
                           Rectangle player2,
                           Circle ball,
-                          View view)
-    {
+                          View view) {
         this.bordeNorte = bordeNorte;
         this.bordeSur = bordeSur;
         this.bordeEste = bordeEste;
@@ -114,7 +115,7 @@ public class ViewController {
                     break;
                 case L:
                     if (!player2.getBoundsInParent().intersects(bordeSur.getBoundsInParent())) {
-                       movePlayer2 = 4.00;
+                        movePlayer2 = 4.00;
                     }
                     break;
             }
@@ -130,9 +131,11 @@ public class ViewController {
 
     private void checkGolpeo() {
         if (ball.getBoundsInParent().intersects(player2.getBoundsInParent())) {
+            reproduceGolpeo();
             moveX = -4.0;
             moveY = randomY();
         } else if (ball.getBoundsInParent().intersects(player1.getBoundsInParent())) {
+            reproduceGolpeo();
             moveX = 4.0;
             moveY = randomY();
         }
@@ -148,13 +151,13 @@ public class ViewController {
         }
 
         if (ball.getBoundsInParent().intersects(bordeEste.getBoundsInParent())) {
-            resetPositions(x, y, yPlayer1, yPlayer2);
             updateScore(1);
+            resetPositions(x, y, yPlayer1, yPlayer2);
         }
 
         if (ball.getBoundsInParent().intersects(bordeOeste.getBoundsInParent())) {
-            resetPositions(x, y,  yPlayer1, yPlayer2);
             updateScore(2);
+            resetPositions(x, y, yPlayer1, yPlayer2);
         }
     }
 
@@ -163,33 +166,45 @@ public class ViewController {
             pointsP1++;
             view.scoreP1.setText("PLAYER 1: " + pointsP1);
 
-            showGoalMessage();
+            reproduceGoal();
+            waitAnimation();
             checkPoints();
         } else if (winner == 2) {
             pointsP2++;
             view.scoreP2.setText("PLAYER 2: " + pointsP2);
 
-            showGoalMessage();
+            reproduceGoal();
+            waitAnimation();
             checkPoints();
         }
     }
 
-    private void showGoalMessage() {
-        view.goalView.setVisible(true);
+    private void reproduceGoal() {
+        String archivoGoal = "audios/score.mp3";
+        File archivo = new File(archivoGoal);
+        Media audio = new Media(archivo.toURI().toString());
+
+        MediaPlayer player = new MediaPlayer(audio);
+
         animation.stop();
+        player.play();
+        animation.play();
+    }
 
-        try {
-            Thread.sleep(900);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    private void reproduceGolpeo() {
+        String archivoGolpeo = "audios/golpeo.mp3";
+        File archivo = new File(archivoGolpeo);
+        Media audio = new Media(archivo.toURI().toString());
 
-        view.goalView.setVisible(false);
-        try {
-            Thread.sleep(300);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        MediaPlayer player = new MediaPlayer(audio);
+
+        player.play();
+    }
+
+    private void waitAnimation() {
+        animation.stop();
+        animation.setDelay(Duration.millis(1000));
+
         animation.play();
     }
 
@@ -207,7 +222,7 @@ public class ViewController {
             stage.getIcons().add(imageView.getImage());
 
             alert.setTitle("VICTORIA");
-            alert.setHeaderText("EL JUGADOR 1 HA GANADO");
+            alert.setHeaderText("EL JUGADOR AZUL HA GANADO");
             alert.setContentText("Reinicie el juego para volver a jugar...");
             alert.show();
 
@@ -224,7 +239,7 @@ public class ViewController {
             stage.getIcons().add(imageView.getImage());
 
             alert.setTitle("VICTORIA");
-            alert.setHeaderText("EL JUGADOR 2 HA GANADO");
+            alert.setHeaderText("EL JUGADOR ROJO HA GANADO");
             alert.setContentText("Reinicie el juego para volver a jugar...");
             alert.show();
 
