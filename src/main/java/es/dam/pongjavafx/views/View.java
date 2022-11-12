@@ -126,7 +126,8 @@ public class View extends StackPane {
         gameOverView.setVisible(false);
         StackPane.setAlignment(gameOverView, Pos.CENTER);
 
-        Button start = new Button("", imageView);
+        Button start = new Button("Azul: Q - A." + "\n" + "Rojo: P - L.", imageView);
+        start.setTextFill(Color.BLACK);
         start.setFont(Font.font("Century Gothic"));
         start.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
         StackPane.setAlignment(start, Pos.CENTER);
