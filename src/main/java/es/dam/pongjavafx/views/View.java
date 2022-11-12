@@ -24,7 +24,7 @@ import java.io.FileNotFoundException;
 public class View extends StackPane {
     public Label scoreP1;
     public Label scoreP2;
-    public ImageView goalView;
+    public ImageView gameOverView;
 
     public View() throws FileNotFoundException {
         this.setBackground(new Background(new BackgroundFill(Color.FORESTGREEN, new CornerRadii(0), new Insets(0))));
@@ -118,13 +118,13 @@ public class View extends StackPane {
         imageView.setFitHeight(200);
         imageView.setFitWidth(200);
 
-        FileInputStream file = new FileInputStream("images" + File.separator +"goal.png");
-        Image goal = new Image(file);
-        goalView = new ImageView(goal);
-        goalView.setFitHeight(200);
-        goalView.setFitWidth(200);
-        goalView.setVisible(false);
-        StackPane.setAlignment(goalView, Pos.CENTER);
+        FileInputStream file = new FileInputStream("images" + File.separator + "game-over.png");
+        Image gameover = new Image(file);
+        gameOverView = new ImageView(gameover);
+        gameOverView.setFitHeight(200);
+        gameOverView.setFitWidth(200);
+        gameOverView.setVisible(false);
+        StackPane.setAlignment(gameOverView, Pos.CENTER);
 
         Button start = new Button("", imageView);
         start.setFont(Font.font("Century Gothic"));
@@ -146,6 +146,6 @@ public class View extends StackPane {
             }
         });
 
-        this.getChildren().addAll(cespedPlayer1, cespedPlayer2, player1, player2, bordeNorte, bordeSur, bordeEste, bordeOeste, lineaCentro, circuloCentro, title, scoreP1, scoreP2, ball, start, goalView);
+        this.getChildren().addAll(cespedPlayer1, cespedPlayer2, player1, player2, bordeNorte, bordeSur, bordeEste, bordeOeste, lineaCentro, circuloCentro, title, scoreP1, scoreP2, ball, start, gameOverView);
     }
 }

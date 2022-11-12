@@ -226,8 +226,9 @@ public class ViewController {
             alert.setContentText("Reinicie el juego para volver a jugar...");
             alert.show();
 
+            view.gameOverView.setVisible(true);
             animation.stop();
-
+            
         } else if (pointsP2 == 7) {
             alert = new Alert(Alert.AlertType.INFORMATION);
 
@@ -243,6 +244,7 @@ public class ViewController {
             alert.setContentText("Reinicie el juego para volver a jugar...");
             alert.show();
 
+            view.gameOverView.setVisible(true);
             animation.stop();
         }
     }
