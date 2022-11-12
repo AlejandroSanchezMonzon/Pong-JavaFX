@@ -21,7 +21,6 @@ public class App extends Application {
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();
-
         String dir = System.getProperty("user.dir") + File.separator + "src" + File.separator + "main" + File.separator + "resources";
         FileInputStream input = new FileInputStream(dir + File.separator + "images" + File.separator + "ping-pong.png");
         Image image = new Image(input);

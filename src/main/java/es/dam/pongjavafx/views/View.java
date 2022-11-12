@@ -134,7 +134,6 @@ public class View extends StackPane {
         start.setBackground(new Background(new BackgroundFill(Color.TRANSPARENT, null, null)));
         StackPane.setAlignment(start, Pos.CENTER);
 
-
         ViewController controller = new ViewController(bordeNorte, bordeSur, bordeEste, bordeOeste, player1, player2, ball, this);
 
         start.setOnMouseClicked(event -> {
